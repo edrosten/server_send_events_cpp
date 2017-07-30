@@ -20,7 +20,7 @@ class StupidFakeHttpServerLOL
 	private:
 		int sockfd=-1; 
 		atomic<int> newsockfd{-1};
-		int port=6502;
+		int port=8080;
 		socklen_t clilen = 0;
 		sockaddr_in serv_addr = {};
 		sockaddr_in cli_addr = {};
@@ -69,14 +69,13 @@ class StupidFakeHttpServerLOL
 			date << std::put_time(localtime(&t), "%a, %d %b %Y %H:%M:%S %Z");
 
 			newsockfd = fd;
-			write(R"(HTTP/1.1 200 OK
-Date: )" + date.str() + R"(
-Cache-Control: no-cache,public
-Content-Type: text/event-stream
-Connection: keep-alive
-)");
-			write("\n");
-
+			write("HTTP/1.1 200 OK\r\n"
+			      "Content-Type: text/event-stream\r\n"
+			      "Date: " + date.str() + "\r\n"
+                  "Transfer-Encoding: chunked\r\n"
+				  "Access-Control-Allow-Origin: *\r\n"
+			      "\r\n");
+			write_chunk("retry: 100\n\n");
 		}
 
 		void write(const string& str)
@@ -94,6 +93,13 @@ Connection: keep-alive
 			}
 		}
 
+		void write_chunk(const string& str)
+		{
+			ostringstream o;
+			o << hex << str.size() << "\r\n" << str << "\r\n";
+			write(o.str());
+		}
+
 		~StupidFakeHttpServerLOL()
 		{
 			cerr << "closing\n";
@@ -109,11 +115,11 @@ int main()
 
 	hax.accept();
 
-	for(int i=0;;i++)
+	for(int i=1;;i++)
 	{
 		if(cin.get() == EOF)
 			break;
-		hax.write("data: wtf " + to_string(i) + "\n\n");
+		hax.write_chunk("data: " + to_string(i) + "\n\n");
 
 	}
 
