@@ -54,13 +54,14 @@ class StupidFakeHttpServerLOL
 
 			if (fd < 0) 
 				throw runtime_error("Error accepting:"s + strerror(errno));
+			
 
+			//Read the HTTP request and promptly ignore it...
+			//But dump it out for fun.
 			vector<char> buf(65536, 0);
-
 			int n = read(fd,buf.data(),buf.size());
 			if (n < 0) 
 				throw runtime_error("Error reading from socket:"s + strerror(errno));
-
 			cout << "Message reads: ";
 			cout.write(buf.data(), n);
 
@@ -69,13 +70,13 @@ class StupidFakeHttpServerLOL
 			date << std::put_time(localtime(&t), "%a, %d %b %Y %H:%M:%S %Z");
 
 			newsockfd = fd;
-			write("HTTP/1.1 200 OK\r\n"
-			      "Content-Type: text/event-stream\r\n"
-			      "Date: " + date.str() + "\r\n"
-                  "Transfer-Encoding: chunked\r\n"
-				  "Access-Control-Allow-Origin: *\r\n"
+			write("HTTP/1.1 200 OK\r\n"                     //Standard HTTP start
+			      "Content-Type: text/event-stream\r\n"     //Mandatory for SSEs
+			      "Date: " + date.str() + "\r\n"            //Apparently date is mandatory too.
+                  "Transfer-Encoding: chunked\r\n"          //Posible without? Chunked encoding lets it know when an event is done without knowing packet boundaries.
+				  "Access-Control-Allow-Origin: *\r\n"      //Because the HTML comes from a file, not this server, we have to allow access
 			      "\r\n");
-			write_chunk("retry: 100\n\n");
+			write_chunk("retry: 100\n\n");	
 		}
 
 		void write(const string& str)
@@ -95,6 +96,7 @@ class StupidFakeHttpServerLOL
 
 		void write_chunk(const string& str)
 		{
+			//Chunked encoding is the size in hex followed by the data.
 			ostringstream o;
 			o << hex << str.size() << "\r\n" << str << "\r\n";
 			write(o.str());
