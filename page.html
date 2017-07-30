@@ -8,7 +8,7 @@
 
 <script>
 if(typeof(EventSource) !== "undefined") {
-    var source = new EventSource("http://127.0.0.1:8080");
+    var source = new EventSource("http://127.0.0.1:6502");
     source.onmessage = function(event) {
         document.getElementById("result").innerHTML += event.data + "<br>";
     };

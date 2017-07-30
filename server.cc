@@ -20,7 +20,7 @@ class StupidFakeHttpServerLOL
 	private:
 		int sockfd=-1; 
 		atomic<int> newsockfd{-1};
-		int port=8080;
+		int port=6502;
 		socklen_t clilen = 0;
 		sockaddr_in serv_addr = {};
 		sockaddr_in cli_addr = {};
