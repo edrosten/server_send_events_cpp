@@ -68,16 +68,6 @@ class VeryBasicServer
 			cout.write(buf.data(), n);
 		}
 
-		string http_compliant_date_now()
-		{
-			auto t = std::time(nullptr);
-			ostringstream date;
-			//Format is like: Sun, 13 Aug 2017 17:26:28 BST
-			//RFC 1123 (minor mod on RFC 822)
-			date << std::put_time(localtime(&t), "%a, %d %b %Y %H:%M:%S %Z");
-			return date.str();
-		}
-
 		void accept()
 		{
 			//Listen blocks until a cnnection is made, then hands over the newly created
@@ -112,7 +102,6 @@ class VeryBasicServer
 			//Note also the \r\n line terminations, not just \n. Part of the HTTP spec.
 			write("HTTP/1.1 200 OK\r\n"                          //Standard HTTP header line
 			      "Content-Type: text/event-stream\r\n"          //This is the only allowed MIME type for SSE
-			      "Date: " + http_compliant_date_now() + "\r\n"  //Date is a mandatory part of the header and firefox checks this.
                   "Transfer-Encoding: chunked\r\n"               //Chunked encoding lets it know when an event is done without knowing packet boundaries.
 				  "Access-Control-Allow-Origin: *\r\n"           //Because the HTML comes from a file, not this server, we have to allow access
 			      "\r\n");                                       //End of header indicator
