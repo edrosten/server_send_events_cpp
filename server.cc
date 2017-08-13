@@ -72,6 +72,8 @@ class VeryBasicServer
 		{
 			auto t = std::time(nullptr);
 			ostringstream date;
+			//Format is like: Sun, 13 Aug 2017 17:26:28 BST
+			//RFC 1123 (minor mod on RFC 822)
 			date << std::put_time(localtime(&t), "%a, %d %b %Y %H:%M:%S %Z");
 			return date.str();
 		}
@@ -80,9 +82,7 @@ class VeryBasicServer
 		{
 			//Listen blocks until a cnnection is made, then hands over the newly created
 			//socket for the connection
-			sockaddr_in client_addr = {};
-			socklen_t clilen = sizeof(client_addr);
-			connection_fd = ::accept(sockfd, (struct sockaddr *) &client_addr, &clilen);
+			connection_fd = ::accept(sockfd, nullptr, nullptr);
 
 			if (connection_fd < 0) 
 				throw runtime_error("Error accepting:"s + strerror(errno));
@@ -167,8 +167,8 @@ int main()
 		//See https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
 		//for more info (e.g. different message types and dispatch)
 		string sse;
-		sse += "data: " + to_string(i) + "\n";
-		sse += "\n";
+		sse += "data: " + to_string(i) + "\n";  //Send the current number as the data value
+		sse += "\n";                            //Empty field ends the message.
 
 		//Send the message data using chunked encoding
 		hax.write_chunk(sse);
