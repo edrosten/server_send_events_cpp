@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html>
+<head>  <meta charset="UTF-8"> </head>
 <body>
 
 <h1>Getting server updates</h1>
@@ -10,14 +10,10 @@
 if(typeof(EventSource) !== "undefined") {
     var source = new EventSource("http://127.0.0.1:6502");
     source.onmessage = function(event) {
-        document.getElementById("result").innerHTML += event.data + "<br>";
+        document.getElementById("result").innerHTML += "Data: " + event.data + "<br>";
     };
     source.onerror = function(event) {
-        document.getElementById("result").innerHTML += event.data + " blork<br>";
-        document.getElementById("result").innerHTML += event.type + " blork<br>";
-        document.getElementById("result").innerHTML += event.errno + " blork<br>";
-        document.getElementById("result").innerHTML += event.error + " blork<br>";
-        document.getElementById("result").innerHTML += event.message + " blork<br>";
+        document.getElementById("result").innerHTML += "Connection failed<br>";
     };
 } else {
     document.getElementById("result").innerHTML = "Sorry, your browser does not support server-sent events...";
