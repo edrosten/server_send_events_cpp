@@ -87,7 +87,7 @@ class VeryBasicServer
 			if (connection_fd < 0) 
 				throw runtime_error("Error accepting:"s + strerror(errno));
 			
-			//We can actually ignore most of the HTTP header just to get up
+			//We can actually ignore the HTTP header just to get up
 			//and running. For ServerSendEvents, there's only one accepted
 			//MIME type, and uncompressed is always a valid compression option
 			//even if the client_ doesn't request it.
